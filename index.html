@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Encuesta de seguimiento · 3er día</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5F4;
+  --card:#FFFFFF;
+  --ink:#16252C;
+  --muted:#5E7076;
+  --line:#DCE4E2;
+  --verde:#0F6E58;
+  --verde-soft:#E4F0EC;
+  --verde-ink:#0A4F3F;
+  --display:"Fraunces", Georgia, serif;
+  --body:"Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:17px;line-height:1.5;min-height:100dvh;display:flex;justify-content:center;
+}
+.app{
+  width:100%;max-width:540px;
+  padding:20px 18px calc(26px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;min-height:100dvh;
+}
+
+/* ---------- encabezado ---------- */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:20px;min-height:36px}
+.top[hidden]{display:none}
+.back{
+  background:var(--card);border:1px solid var(--line);color:var(--muted);
+  width:36px;height:36px;border-radius:50%;font-size:17px;cursor:pointer;
+  display:grid;place-items:center;flex:0 0 auto;font-family:var(--body);
+}
+.back:hover{color:var(--ink);border-color:var(--muted)}
+.bars{display:flex;gap:3px;flex:1}
+.bar{height:6px;border-radius:99px;background:#DFE6E4;flex:1;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--verde);border-radius:99px;transition:width .35s ease}
+.bar.done i,.bar.now i{width:100%}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto;font-weight:600}
+
+/* ---------- sello ---------- */
+.seal{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--verde-soft);color:var(--verde-ink);
+  border-radius:99px;padding:8px 14px;font-size:13.5px;font-weight:600;
+  line-height:1.3;margin-bottom:18px;align-self:flex-start;
+}
+
+/* ---------- pasos ---------- */
+.step{display:none;flex-direction:column;flex:1}
+.step.active{display:flex;animation:in .3s cubic-bezier(.22,1,.36,1)}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.emoji-big{font-size:42px;line-height:1;margin-bottom:10px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(30px,8vw,38px);line-height:1.08;letter-spacing:-.015em;margin:0 0 14px}
+h2{font-family:var(--display);font-weight:600;font-size:clamp(24px,6vw,29px);line-height:1.18;letter-spacing:-.01em;margin:0 0 8px;max-width:20ch}
+.hint{color:var(--muted);font-size:15.5px;margin:0 0 18px;max-width:34ch}
+.intro p{color:var(--muted);font-size:17px;max-width:34ch;margin:0 0 12px}
+.intro p strong{color:var(--ink);font-weight:600}
+
+/* ---------- opciones ---------- */
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.opt{
+  display:flex;align-items:center;gap:13px;width:100%;text-align:left;cursor:pointer;
+  background:var(--card);border:1.5px solid var(--line);color:var(--ink);
+  font-family:var(--body);font-size:16.5px;font-weight:500;
+  padding:15px 16px;border-radius:14px;
+  transition:border-color .15s ease, background .15s ease, transform .12s ease;
+}
+.opt:hover{border-color:#B9C6C2}
+.opt:active{transform:scale(.99)}
+.opt .em{font-size:25px;line-height:1;flex:0 0 auto;width:30px;text-align:center}
+.opt .stars{color:#E0A73A;letter-spacing:1.5px;font-size:14px;min-width:74px;flex:0 0 auto}
+.opt.sel{border-color:var(--verde);background:var(--verde-soft);font-weight:600}
+.opt.sel::after{content:"✓";margin-left:auto;color:var(--verde);font-weight:800}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two .opt{flex-direction:column;justify-content:center;gap:10px;padding:26px 12px;text-align:center}
+.two .opt .em{font-size:36px;width:auto}
+.two .opt.sel::after{display:none}
+
+/* ---------- desplegables ---------- */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:14.5px;font-weight:700;margin-bottom:7px}
+.select-wrap{position:relative}
+.select-wrap::after{
+  content:"▾";position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  color:var(--verde);font-size:18px;pointer-events:none;
+}
+select{
+  width:100%;appearance:none;-webkit-appearance:none;
+  background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+  padding:16px 42px 16px 16px;font-family:var(--body);font-size:16.5px;font-weight:500;
+  color:var(--ink);cursor:pointer;
+}
+select:focus{outline:none;border-color:var(--verde)}
+select:disabled{opacity:.5;cursor:not-allowed}
+select.ok{border-color:var(--verde);background:var(--verde-soft)}
+
+/* ---------- contactos ---------- */
+.contacts{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.contact{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;
+  color:var(--ink);text-decoration:none;font-weight:600;transition:border-color .15s ease;
+}
+.contact:hover{border-color:var(--verde)}
+.contact.mine{border-color:var(--verde);background:var(--verde-soft)}
+.contact .em{font-size:24px;flex:0 0 auto}
+.contact .who{display:flex;flex-direction:column;line-height:1.25}
+.contact .num{font-size:14px;color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+.contact .wa{margin-left:auto;font-size:13px;font-weight:700;color:#fff;background:#25D366;padding:7px 13px;border-radius:99px}
+.group-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px}
+
+/* ---------- botones ---------- */
+.actions{margin-top:auto;padding-top:22px;display:flex;flex-direction:column;gap:10px}
+.btn{
+  width:100%;border:none;cursor:pointer;font-family:var(--body);font-weight:700;font-size:17px;
+  padding:17px;border-radius:14px;background:var(--verde);color:#fff;
+  transition:filter .15s ease, transform .12s ease;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:scale(.99)}
+.btn.ghost{background:none;color:var(--muted);border:1.5px solid var(--line);font-weight:500;font-size:16px}
+.btn.ghost:hover{color:var(--ink);border-color:var(--muted)}
+.btn[disabled]{opacity:.5;cursor:default}
+:focus-visible{outline:3px solid var(--verde);outline-offset:3px}
+
+/* ---------- cierre ---------- */
+.legal{font-size:13.5px;color:var(--muted);margin-top:20px;max-width:36ch}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top" id="top" hidden>
+    <button class="back" id="back" aria-label="Volver">←</button>
+    <div class="bars" id="bars" aria-hidden="true"></div>
+    <span class="count" id="count"></span>
+  </div>
+
+  <!-- INTRO -->
+  <section class="step active intro" data-step="intro">
+    <div class="seal">🔒 Confidencial · no lleva tu nombre</div>
+    <div class="emoji-big">👋</div>
+    <h1>¡Ya cumpliste tus primeros 3 días!</h1>
+    <p>Queremos saber cómo fue tu arranque: cómo te recibieron, qué te enseñaron y cómo te sentiste.</p>
+    <p>Son <strong>17 preguntas rápidas</strong> ⚡ y te lleva menos de 3 minutos.</p>
+    <p>Las recibe solo el equipo de <strong>Recursos Humanos</strong>. 🙅 No se comparten con el local ni con tus responsables.</p>
+    <p>No hay respuestas buenas ni malas 💬 lo que nos contás sirve para mejorar.</p>
+    <div class="actions">
+      <button class="btn" id="start">Empezar 🚀</button>
+    </div>
+  </section>
+
+  <!-- 1 · ROL -->
+  <section class="step" data-step="1">
+    <div class="emoji-big">🧑‍🍳</div>
+    <h2>¿Qué rol cumplís?</h2>
+    <p class="hint">Elegí el puesto que tenés hoy en el local.</p>
+    <div class="opts" data-q="rol">
+      <button class="opt" data-val="Gerente"><span class="em">👑</span> Gerente</button>
+      <button class="opt" data-val="Encargado"><span class="em">🎖️</span> Encargado/a</button>
+      <button class="opt" data-val="Entrenador"><span class="em">🏅</span> Entrenador/a</button>
+      <button class="opt" data-val="Full-time"><span class="em">⭐</span> Full-time</button>
+      <button class="opt" data-val="Part-time"><span class="em">✨</span> Part-time</button>
+    </div>
+  </section>
+
+  <!-- 2 · EDAD -->
+  <section class="step" data-step="2">
+    <div class="emoji-big">🎂</div>
+    <h2>¿Cuál es tu edad?</h2>
+    <div class="opts" data-q="edad">
+      <button class="opt" data-val="18 a 22 años"><span class="em">🎈</span> 18 a 22 años</button>
+      <button class="opt" data-val="23 a 28 años"><span class="em">🎯</span> 23 a 28 años</button>
+      <button class="opt" data-val="29 a 32 años"><span class="em">🚀</span> 29 a 32 años</button>
+      <button class="opt" data-val="Más de 32 años"><span class="em">💼</span> Más de 32 años</button>
+    </div>
+  </section>
+
+  <!-- 3 · EXPERIENCIA PREVIA -->
+  <section class="step" data-step="3">
+    <div class="emoji-big">🍟</div>
+    <h2>¿Tenías experiencia previa en fast-food?</h2>
+    <div class="opts two" data-q="experiencia">
+      <button class="opt" data-val="Sí"><span class="em">👍</span> Sí</button>
+      <button class="opt" data-val="No"><span class="em">🆕</span> No, es mi primera vez</button>
+    </div>
+  </section>
+
+  <!-- 4 · MARCA -->
+  <section class="step" data-step="4">
+    <div class="emoji-big">🏪</div>
+    <h2>¿En qué marca trabajás?</h2>
+    <div class="opts two" data-q="marca">
+      <button class="opt" data-val="Sabores Express"><span class="em">🥐</span> Sabores Express</button>
+      <button class="opt" data-val="Hamburguesas Extremas"><span class="em">🍔</span> Hamburguesas Extremas</button>
+    </div>
+  </section>
+
+  <!-- 5 · ZONA Y LOCAL -->
+  <section class="step" data-step="5">
+    <div class="emoji-big">📍</div>
+    <h2>¿Dónde trabajás?</h2>
+    <p class="hint">Nos sirve para saber en qué zona mejorar. Seguís siendo anónimo/a. 🔒</p>
+    <div class="field">
+      <label for="zona">🧭 Zona</label>
+      <div class="select-wrap">
+        <select id="zona">
+          <option value="">Elegí tu zona…</option>
+          <option value="Sur">🔴 SUR</option>
+          <option value="CABA">⚪ CABA</option>
+          <option value="Oeste">🟠 Oeste</option>
+          <option value="Norte">🔵 Norte</option>
+          <option value="GBA">🟣 GBA</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" id="campoLocal">
+      <label for="local">🏬 Local</label>
+      <div class="select-wrap">
+        <select id="local" disabled>
+          <option value="">Elegí tu local…</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="okUbicacion" disabled>Continuar</button>
+    </div>
+  </section>
+
+  <!-- 6 · RECIBIMIENTO -->
+  <section class="step" data-step="6">
+    <div class="emoji-big">🚪</div>
+    <h2>¿Cómo te recibieron tu primer día?</h2>
+    <p class="hint">Pensá en el momento en que llegaste al local por primera vez.</p>
+    <div class="opts" data-q="recibimiento">
+      <button class="opt" data-val="Me recibieron y me presentaron al equipo"><span class="em">🤗</span> Me recibieron y me presentaron al equipo</button>
+      <button class="opt" data-val="Me recibieron pero no me presentaron"><span class="em">🙂</span> Me recibieron, pero no me presentaron al equipo</button>
+      <button class="opt" data-val="Nadie me recibió"><span class="em">😶</span> Nadie me recibió</button>
+    </div>
+  </section>
+
+  <!-- 7 · ENTRENADOR ASIGNADO -->
+  <section class="step" data-step="7">
+    <div class="emoji-big">🏅</div>
+    <h2>¿Tuviste un Entrenador/a que te acompañó?</h2>
+    <p class="hint">Alguien a cargo de enseñarte durante estos primeros días.</p>
+    <div class="opts" data-q="entrenador">
+      <button class="opt" data-val="Sí, me acompañó todo el tiempo"><span class="em">🙌</span> Sí, me acompañó todo el tiempo</button>
+      <button class="opt" data-val="Sí, pero solo a ratos"><span class="em">⏱️</span> Sí, pero solo a ratos</button>
+      <button class="opt" data-val="No, aprendí con distintos compañeros"><span class="em">👥</span> No, aprendí con distintos compañeros</button>
+      <button class="opt" data-val="No, estuve solo/a"><span class="em">😕</span> No, estuve solo/a</button>
+    </div>
+  </section>
+
+  <!-- 8 · ENTRENAMIENTO -->
+  <section class="step" data-step="8">
+    <div class="emoji-big">🧑‍🏫</div>
+    <h2>En estos 3 días, ¿cómo te enseñaron las tareas?</h2>
+    <p class="hint">Pensá en cómo te explicaron lo que tenías que hacer.</p>
+    <div class="opts" data-q="entrenamiento">
+      <button class="opt" data-val="Me explicaron todo con paciencia"><span class="em">🙌</span> Me explicaron todo con paciencia</button>
+      <button class="opt" data-val="Me explicaron lo básico y me fui acomodando"><span class="em">👍</span> Me explicaron lo básico y me fui acomodando</button>
+      <button class="opt" data-val="Me explicaron poco, aprendí mirando"><span class="em">🤔</span> Me explicaron poco, aprendí mirando</button>
+      <button class="opt" data-val="Casi no me explicaron nada"><span class="em">😕</span> Casi no me explicaron nada</button>
+    </div>
+  </section>
+
+  <!-- 9 · TAREAS APRENDIDAS -->
+  <section class="step" data-step="9">
+    <div class="emoji-big">📋</div>
+    <h2>¿Qué tareas aprendiste en estos 3 días?</h2>
+    <p class="hint">Podés elegir más de una opción. 👇</p>
+    <div class="opts" data-q="tareas">
+      <button class="opt multi" data-val="Caja"><span class="em">💳</span> Caja</button>
+      <button class="opt multi" data-val="Cocina / Plancha"><span class="em">🍳</span> Cocina / Plancha</button>
+      <button class="opt multi" data-val="Freidora"><span class="em">🍟</span> Freidora</button>
+      <button class="opt multi" data-val="Armado de pedidos"><span class="em">🥡</span> Armado de pedidos</button>
+      <button class="opt multi" data-val="Delivery / Drive"><span class="em">🛵</span> Delivery / Drive</button>
+      <button class="opt multi" data-val="Limpieza"><span class="em">🧽</span> Limpieza</button>
+      <button class="opt multi" data-val="Atención al cliente"><span class="em">🙋</span> Atención al cliente</button>
+    </div>
+    <div class="actions">
+      <button class="btn" data-next>Continuar</button>
+    </div>
+  </section>
+
+  <!-- 10 · SEGURIDAD E HIGIENE -->
+  <section class="step" data-step="10">
+    <div class="emoji-big">🦺</div>
+    <h2>¿Te explicaron las normas de seguridad e higiene?</h2>
+    <p class="hint">Manipulación de alimentos, uso de freidoras y plancha, cómo evitar quemaduras o cortes.</p>
+    <div class="opts" data-q="seguridad">
+      <button class="opt" data-val="Sí, me lo explicaron bien"><span class="em">✅</span> Sí, me lo explicaron bien</button>
+      <button class="opt" data-val="Me explicaron algo"><span class="em">🤏</span> Me explicaron algo</button>
+      <button class="opt" data-val="No me explicaron"><span class="em">❌</span> No me explicaron</button>
+    </div>
+  </section>
+
+  <!-- 11 · HORARIOS, FRANCOS Y FICHAJE -->
+  <section class="step" data-step="11">
+    <div class="emoji-big">🗓️</div>
+    <h2>¿Te explicaron tus horarios, francos y cómo fichar?</h2>
+    <p class="hint">Tus días y horarios de trabajo, tus días libres y cómo registrar tu entrada y salida.</p>
+    <div class="opts" data-q="horarios">
+      <button class="opt" data-val="Sí, me quedó todo claro"><span class="em">✅</span> Sí, me quedó todo claro</button>
+      <button class="opt" data-val="Algunas cosas"><span class="em">🤏</span> Algunas cosas</button>
+      <button class="opt" data-val="No me explicaron"><span class="em">❌</span> No me explicaron</button>
+    </div>
+  </section>
+
+  <!-- 12 · DESCANSOS -->
+  <section class="step" data-step="12">
+    <div class="emoji-big">☕</div>
+    <h2>¿Pudiste tomar los descansos que te corresponden?</h2>
+    <div class="opts" data-q="descansos">
+      <button class="opt" data-val="Sí, siempre"><span class="em">😌</span> Sí, siempre</button>
+      <button class="opt" data-val="A veces"><span class="em">😐</span> A veces</button>
+      <button class="opt" data-val="No"><span class="em">😓</span> No</button>
+    </div>
+  </section>
+
+  <!-- 13 · TRATO -->
+  <section class="step" data-step="13">
+    <div class="emoji-big">🤝</div>
+    <h2>¿Cómo fue el trato en tus primeros días?</h2>
+    <p class="hint">El trato de tu Gerente, Encargado/a, Entrenador/a y compañeros.</p>
+    <div class="opts" data-q="trato">
+      <button class="opt" data-val="Muy bueno"><span class="em">💛</span> Muy bueno, me hicieron sentir parte</button>
+      <button class="opt" data-val="Bueno"><span class="em">😊</span> Bueno, sin problemas</button>
+      <button class="opt" data-val="Regular"><span class="em">😐</span> Regular, hubo momentos incómodos</button>
+      <button class="opt" data-val="Malo"><span class="em">😞</span> Malo, no me trataron bien</button>
+    </div>
+  </section>
+
+  <!-- 14 · REFERENTE -->
+  <section class="step" data-step="14">
+    <div class="emoji-big">🧭</div>
+    <h2>Si tenés un problema, ¿sabés a quién recurrir?</h2>
+    <p class="hint">Dentro del local o en Recursos Humanos.</p>
+    <div class="opts" data-q="referente">
+      <button class="opt" data-val="Sí, sé a quién recurrir"><span class="em">👌</span> Sí, sé a quién recurrir</button>
+      <button class="opt" data-val="Más o menos"><span class="em">🤷</span> Más o menos</button>
+      <button class="opt" data-val="No sé a quién recurrir"><span class="em">❓</span> No sé a quién recurrir</button>
+    </div>
+  </section>
+
+  <!-- 15 · INCONVENIENTE -->
+  <section class="step" data-step="15">
+    <div class="emoji-big">🔎</div>
+    <h2>¿Sucedió algo que no te agradó?</h2>
+    <p class="hint">Puede ser una situación puntual, un comentario o algo del trato que recibiste.</p>
+    <div class="opts two" data-q="inconveniente">
+      <button class="opt" data-val="No"><span class="em">✅</span> No, todo bien</button>
+      <button class="opt" data-val="Sí"><span class="em">🚩</span> Sí, pasó algo</button>
+    </div>
+  </section>
+
+  <!-- CONTACTOS (solo si hubo inconveniente) -->
+  <section class="step" data-step="contactos" data-count="15">
+    <div class="emoji-big">💬</div>
+    <h2>Si querés, contanos directamente</h2>
+    <p class="hint">Escribile por WhatsApp al equipo de Selección de tu zona. Te escuchamos y queda entre nosotros. 🤐</p>
+    <div id="contactos"></div>
+    <div class="actions">
+      <button class="btn" data-next>Continuar con la encuesta ➡️</button>
+    </div>
+  </section>
+
+  <!-- 16 · GENERAL -->
+  <section class="step" data-step="16">
+    <div class="emoji-big">⭐</div>
+    <h2>En general, ¿cómo fueron tus primeros 3 días?</h2>
+    <div class="opts" data-q="general">
+      <button class="opt" data-val="Muy buena"><span class="stars">★★★★★</span> Muy buenos 🤩</button>
+      <button class="opt" data-val="Buena"><span class="stars">★★★★</span> Buenos 🙂</button>
+      <button class="opt" data-val="Regular"><span class="stars">★★★</span> Regulares 😐</button>
+      <button class="opt" data-val="Mala"><span class="stars">★★</span> Malos 🙁</button>
+      <button class="opt" data-val="Muy mala"><span class="stars">★</span> Muy malos 😣</button>
+    </div>
+  </section>
+
+  <!-- 17 · MEJORAS -->
+  <section class="step" data-step="17">
+    <div class="emoji-big">🛠️</div>
+    <h2>¿Qué podríamos mejorar para los que recién empiezan?</h2>
+    <p class="hint">Podés elegir más de una opción. 👇</p>
+    <div class="opts" id="mejoras" data-q="mejoras">
+      <button class="opt multi" data-val="El recibimiento del primer día"><span class="em">🚪</span> El recibimiento del primer día</button>
+      <button class="opt multi" data-val="La explicación de las tareas"><span class="em">📚</span> La explicación de las tareas</button>
+      <button class="opt multi" data-val="La explicación de seguridad e higiene"><span class="em">🦺</span> La explicación de seguridad e higiene</button>
+      <button class="opt multi" data-val="La organización de horarios y turnos"><span class="em">🗓️</span> La organización de horarios y turnos</button>
+      <button class="opt multi" data-val="El trato entre compañeros"><span class="em">🤝</span> El trato entre compañeros</button>
+      <button class="opt multi" data-val="La comunicación de los responsables"><span class="em">🗣️</span> La comunicación de los responsables</button>
+      <button class="opt multi" data-val="Los descansos"><span class="em">☕</span> Los descansos</button>
+      <button class="opt multi" data-val="El orden y la limpieza"><span class="em">🧹</span> El orden y la limpieza</button>
+      <button class="opt multi" data-val="Nada, estuvo todo bien"><span class="em">✨</span> Nada, estuvo todo bien</button>
+    </div>
+    <div class="actions">
+      <button class="btn" id="send">Enviar respuestas 📨</button>
+    </div>
+  </section>
+
+  <!-- CIERRE -->
+  <section class="step" data-step="fin">
+    <div class="emoji-big">🎉</div>
+    <h1>¡Gracias por contarnos!</h1>
+    <p class="hint">Tus respuestas ya llegaron al equipo de Recursos Humanos. 💚</p>
+    <p style="margin:0 0 10px;font-weight:600">Si querés agregar algo, escribinos cuando quieras 👇</p>
+    <div id="contactosFin"></div>
+    <p class="legal">🔒 Lo que nos contás se trata de forma confidencial dentro del área de Recursos Humanos.</p>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   1. Pegá acá la URL del Web App de Apps Script (termina en /exec)
+   ============================================================ */
+const APPS_SCRIPT_URL = "";
+
+const LOCALES = {
+  'Hamburguesas Extremas': {
+    'Sur':   ['Adrogué','Avellaneda','Banfield','Berazategui','Glew','Lanús','Lomas de Zamora','Monte Grande','Solano','Temperley','Varela','Wilde'],
+    'CABA':  ['Caballito','Callao','Flores 1','Flores 2','Florida','Once','Pellegrini','Pompeya','Pueyrredón','Tucumán'],
+    'Oeste': ['Caseros','Castelar','Crovara','Gral. Rodríguez','Hurlingham','Laferrere','Liniers','Loma Hermosa','Merlo','Moreno','Morón','Palomar'],
+    'Norte': ['Boulogne','Garín','Grand Bourg','José C. Paz','Los Polvorines','Manuel Alberti','Munro','Olivos','Pacheco','Pilar','San Fernando','San Isidro'],
+    'GBA':   ['Lezama','Luján','Rosario','Zárate']
+  },
+  'Sabores Express': {
+    'Sur':   ['Banfield','Berazategui 1','Berazategui 2','Claypole','Cruce Varela','El Jagüel','Ezeiza','Gerli','Glew','La Plata 1','La Plata 2','La Plata 3','La Plata 4','Lanús 1/3','Lanús 2','Lanús 4','Lomas 3','Lomas 4','Lomas 5','Monte Grande 1','Monte Grande 2','Quilmes 1','Quilmes 2','Quilmes 3 (Bernal)','Solano','Temperley 1','Temperley 2','Tristán Suárez','Varela','Varela 2','Wilde'],
+    'CABA':  ['Barracas','Belgrano','Boedo','Caballito 1','Caballito 2','Chilavert','Corrientes 1','Corrientes 2','Corrientes 3','Corrientes 4','Entre Ríos','Flores 1','Flores 2','Florida','Lavalle 1','Lavalle 2','Pompeya','Pueyrredón','Pueyrredón 2','Recoleta / Santa Fe','Retiro','Tucumán','Urquiza','Villa del Parque'],
+    'Oeste': ['Caseros 1','Caseros 2','Castillo','Ciudadela','Crovara','Cruce Castelar','El Palomar','Gral. Rodríguez','Haedo','Hurlingham 1','Hurlingham 2','Laferrere 1','Laferrere 2','Liniers 1','Liniers 2','Loma Hermosa','Lomas del Mirador','Luján','Merlo 1','Merlo 2','Merlo 3','Moreno 1','Moreno 2','Moreno 3','Morón 1','Morón 2','Morón 3','Morón 4','Morón 5','Padua','Ramos 1','Ramos 2','Ramos 3','San Justo 1','San Justo 2','San Justo 3','Santos Lugares','Tapiales'],
+    'Norte': ['Adolfo Sourdeaux','Bella Vista','Benavídez','Boulogne','Del Viso','Escobar','Garín','Gran Bourg','José C. Paz 1','José C. Paz 2','José León Suárez','Los Polvorines','Manuel Alberti','Maquinista Savio','Maschwitz','Martínez','Munro','Olivos','Pacheco','Pacheco 2','Pilar 1','Pilar 2','Pte. Saavedra','San Fernando','San Isidro 1','San Isidro 2','San Martín 1','San Martín 2','San Miguel 1','San Miguel 2','San Miguel 3','Talar','Tigre','Tortuguitas','Vicente López','Villa Adelina','Villa Ballester 1','Villa Ballester 2','Virreyes'],
+    'GBA':   ['Córdoba','Lezama','Mdq 1','Mdq 2','Mdq 3','Mdq 4','Mdq 5','Paraná','Rosario 1','Rosario 2','Rosario 3','San Nicolás','Santa Fe Capital','Zárate']
+  }
+};
+
+function localesDe(marca, zona) {
+  return (LOCALES[marca] && LOCALES[marca][zona]) || [];
+}
+
+const EQUIPOS = [
+  { zona:'Norte', em:'🔵', tel:'5491162020108', label:'+54 9 11 6202-0108' },
+  { zona:'Sur',   em:'🔴', tel:'5491171564154', label:'+54 9 11 7156-4154' },
+  { zona:'Oeste', em:'🟠', tel:'5491164076376', label:'+54 9 11 6407-6376' },
+  { zona:'CABA',  em:'⚪', tel:'5491160287684', label:'+54 9 11 6028-7684' }
+];
+
+const steps = [...document.querySelectorAll('.step')];
+const qSteps = steps.filter(s => !isNaN(parseInt(s.dataset.step, 10)));
+const topBar = document.getElementById('top');
+const bars = document.getElementById('bars');
+const count = document.getElementById('count');
+const back = document.getElementById('back');
+const selZona = document.getElementById('zona');
+const selLocal = document.getElementById('local');
+const btnUbic = document.getElementById('okUbicacion');
+let i = 0;
+const historial = [];
+
+const respuestas = {
+  rol:'S/D', edad:'S/D', experiencia:'S/D', marca:'S/D', zona:'S/D', local:'S/D',
+  recibimiento:'S/D', entrenador:'S/D', entrenamiento:'S/D', tareas:[],
+  seguridad:'S/D', horarios:'S/D', descansos:'S/D', trato:'S/D', referente:'S/D',
+  inconveniente:'S/D', contacto:'S/D', general:'S/D', mejoras:[]
+};
+
+qSteps.forEach(() => bars.insertAdjacentHTML('beforeend', '<span class="bar"><i></i></span>'));
+const barEls = [...bars.children];
+
+function paso(nombre) { return steps.findIndex(s => s.dataset.step === nombre); }
+
+function render() {
+  steps.forEach((s, n) => s.classList.toggle('active', n === i));
+  const num = parseInt(steps[i].dataset.count || steps[i].dataset.step, 10);
+  const isQ = !isNaN(num);
+  topBar.hidden = !isQ;
+  if (isQ) {
+    barEls.forEach((b, n) => {
+      b.classList.toggle('done', n < num - 1);
+      b.classList.toggle('now', n === num - 1);
+    });
+    count.textContent = num + '/' + qSteps.length;
+  }
+  window.scrollTo(0, 0);
+}
+
+function go(n) {
+  n = Math.max(0, Math.min(steps.length - 1, n));
+  if (n !== i) historial.push(i);
+  i = n;
+  render();
+}
+
+document.getElementById('start').onclick = () => go(1);
+back.onclick = () => {
+  if (!historial.length) return;
+  i = historial.pop();
+  render();
+};
+document.querySelectorAll('[data-next]').forEach(b => b.onclick = () => go(i + 1));
+
+/* --- opción única: selecciona y avanza --- */
+document.querySelectorAll('.opt:not(.multi)').forEach(btn => {
+  btn.onclick = () => {
+    const group = btn.closest('.opts');
+    group.querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    respuestas[group.dataset.q] = btn.dataset.val;
+    if (group.dataset.q === 'marca') aplicarMarca();
+    let siguiente = i + 1;
+    if (group.dataset.q === 'inconveniente' && btn.dataset.val === 'No') {
+      respuestas.contacto = 'S/D';
+      siguiente = paso('16');
+    }
+    setTimeout(() => go(siguiente), 280);
+  };
+});
+
+/* --- opción múltiple --- */
+document.querySelectorAll('.opt.multi').forEach(btn => {
+  btn.onclick = () => {
+    btn.classList.toggle('sel');
+    const group = btn.closest('.opts');
+    respuestas[group.dataset.q] = [...group.querySelectorAll('.opt.sel')].map(b => b.dataset.val);
+  };
+});
+
+/* --- zona y local --- */
+// Al cambiar de marca se reinicia zona y local: los listados son distintos.
+function aplicarMarca() {
+  selZona.value = '';
+  selZona.classList.remove('ok');
+  respuestas.zona = 'S/D';
+  reiniciarLocal();
+  validarUbicacion();
+}
+
+function reiniciarLocal() {
+  selLocal.innerHTML = '<option value="">Elegí tu local…</option>';
+  selLocal.classList.remove('ok');
+  selLocal.disabled = true;
+  respuestas.local = 'S/D';
+}
+
+selZona.onchange = () => {
+  respuestas.zona = selZona.value || 'S/D';
+  selZona.classList.toggle('ok', !!selZona.value);
+  reiniciarLocal();
+  const lista = localesDe(respuestas.marca, selZona.value);
+  lista.forEach(l => selLocal.insertAdjacentHTML('beforeend', '<option value="' + l + '">' + l + '</option>'));
+  selLocal.disabled = lista.length === 0;
+  validarUbicacion();
+};
+
+selLocal.onchange = () => {
+  respuestas.local = selLocal.value || 'S/D';
+  selLocal.classList.toggle('ok', !!selLocal.value);
+  validarUbicacion();
+};
+
+function validarUbicacion() {
+  btnUbic.disabled = !selZona.value || !selLocal.value;
+}
+
+btnUbic.onclick = () => { pintarContactos(); go(i + 1); };
+
+/* --- contactos por zona --- */
+function tarjeta(eq, mine) {
+  return '<a class="contact' + (mine ? ' mine' : '') + '" data-nombre="Zona ' + eq.zona + '" ' +
+         'href="https://wa.me/' + eq.tel + '" target="_blank" rel="noopener">' +
+         '<span class="em">' + eq.em + '</span>' +
+         '<span class="who"><span>Equipo Zona ' + eq.zona + (mine ? ' · tu zona 💚' : '') + '</span>' +
+         '<span class="num">' + eq.label + '</span></span>' +
+         '<span class="wa">WhatsApp</span></a>';
+}
+
+function pintarContactos() {
+  const mios = EQUIPOS.filter(e => e.zona === respuestas.zona);
+  const otros = EQUIPOS.filter(e => e.zona !== respuestas.zona);
+  let html = '';
+  if (mios.length) {
+    html += '<div class="contacts">' + mios.map(e => tarjeta(e, true)).join('') + '</div>';
+    html += '<div class="group-label">Otros equipos</div>';
+    html += '<div class="contacts">' + otros.map(e => tarjeta(e, false)).join('') + '</div>';
+  } else {
+    html = '<div class="contacts">' + EQUIPOS.map(e => tarjeta(e, false)).join('') + '</div>';
+  }
+  document.getElementById('contactos').innerHTML = html;
+  document.getElementById('contactosFin').innerHTML =
+    '<div class="contacts">' + EQUIPOS.map(e => tarjeta(e, e.zona === respuestas.zona)).join('') + '</div>';
+  document.querySelectorAll('#contactos .contact').forEach(a => {
+    a.addEventListener('click', () => { respuestas.contacto = a.dataset.nombre; });
+  });
+}
+
+/* --- envío ---
+   Primero intenta un POST normal para poder LEER la respuesta del script
+   (así, si algo falla, queda el motivo en la consola del navegador).
+   Si el navegador bloquea la lectura por CORS, reintenta en modo no-cors,
+   que igual entrega los datos aunque no devuelva respuesta. */
+async function enviar() {
+  const btn = document.getElementById('send');
+  btn.disabled = true;
+  btn.textContent = 'Enviando… ⏳';
+  const unir = arr => arr.length ? arr.join(' | ') : 'S/D';
+  const payload = Object.assign({ encuesta: '3er día' }, respuestas, {
+    tareas: unir(respuestas.tareas),
+    mejoras: unir(respuestas.mejoras),
+    enviado: new Date().toISOString()
+  });
+  const cuerpo = {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  };
+
+  if (!APPS_SCRIPT_URL) {
+    console.warn('⚠️ Falta cargar APPS_SCRIPT_URL. Respuestas:', payload);
+    go(paso('fin'));
+    return;
+  }
+
+  try {
+    const r = await fetch(APPS_SCRIPT_URL, cuerpo);
+    const txt = await r.text();
+    console.log('✅ Respuesta del script:', txt);
+  } catch (e) {
+    console.warn('CORS bloqueó la lectura, reintentando en no-cors:', e);
+    try {
+      await fetch(APPS_SCRIPT_URL, Object.assign({ mode: 'no-cors' }, cuerpo));
+      console.log('✅ Enviado en modo no-cors (sin confirmación de lectura).');
+    } catch (e2) {
+      console.error('❌ No se pudo enviar:', e2);
+    }
+  }
+  go(paso('fin'));
+}
+document.getElementById('send').onclick = enviar;
+
+pintarContactos();
+render();
+</script>
+</body>
+</html>
