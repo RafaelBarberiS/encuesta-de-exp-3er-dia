@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Dashboard · Encuesta 3er día</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#CFDFD7;
+  --bg-deep:#BFD3CA;
+  --card:#F5F9F7;
+  --ink:#16252C;
+  --muted:#4E6168;
+  --line:#B9CCC4;
+  --track:#DDE8E3;
+  --verde:#0F6E58;
+  --verde-soft:#E4F0EC;
+  --verde-ink:#0A4F3F;
+  --bien:#0F6E58;
+  --regular:#E0A73A;
+  --mal:#C0504D;
+  --display:"Fraunces", Georgia, serif;
+  --body:"Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.45;min-height:100vh}
+button,select,input{font-family:var(--body);font-size:15px;color:var(--ink)}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--verde);outline-offset:2px}
+
+/* ---------- login ---------- */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login-card{background:var(--card);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(22,37,44,.1)}
+.login-card h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.1;margin:0 0 8px}
+.login-card p{color:var(--muted);margin:0 0 20px}
+.login-card input{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;background:#fff;margin-bottom:12px}
+.login-card input:focus{outline:none;border-color:var(--verde)}
+.error{color:var(--mal);font-weight:600;font-size:14px;margin:0 0 12px;min-height:1em}
+
+/* ---------- botones ---------- */
+.btn{border:none;cursor:pointer;font-weight:700;padding:13px 18px;border-radius:12px;background:var(--verde);color:#fff;transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn.full{width:100%}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);font-weight:600}
+.btn.ghost:hover{border-color:var(--muted);filter:none}
+.btn.small{padding:8px 13px;font-size:14px;border-radius:10px}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+header.top{padding:26px 0 14px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;justify-content:space-between}
+header.top h1{font-family:var(--display);font-weight:600;font-size:clamp(26px,4vw,36px);line-height:1.05;margin:0}
+header.top .sub{color:var(--muted);font-size:14.5px;margin-top:6px}
+header.top .acciones{display:flex;gap:8px;align-items:center}
+.demo-tag{background:var(--regular);color:var(--ink);font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:99px;margin-left:8px;vertical-align:middle;font-family:var(--body)}
+
+.filtros{position:sticky;top:0;z-index:10;background:rgba(207,223,215,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:12px 0}
+.filtros .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.f{display:flex;flex-direction:column;gap:4px;min-width:130px;flex:1 1 130px}
+.f label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.f select,.f input[type=date]{padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);width:100%}
+.f select.on,.f input.on{border-color:var(--verde);background:var(--verde-soft);font-weight:600}
+.check{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding:9px 4px;cursor:pointer;flex:0 0 auto}
+.check input{width:18px;height:18px;accent-color:var(--verde)}
+
+section.bloque{margin:26px 0}
+.bloque-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.bloque-head h2{font-family:var(--display);font-weight:600;font-size:24px;margin:0}
+.bloque-head .ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bloque-head .ctrl select{padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);font-weight:600}
+.nota{color:var(--muted);font-size:14px;margin:-4px 0 12px}
+
+.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 1px 2px rgba(22,37,44,.06)}
+.card h3{font-size:15.5px;font-weight:700;margin:0 0 12px;line-height:1.3}
+.grid{display:grid;gap:14px}
+.grid.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.grid.preguntas{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+.grid.dos{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.vacio{color:var(--muted);font-style:italic;padding:8px 0}
+
+/* ---------- KPIs ---------- */
+.kpi .lbl{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.kpi .num{font-family:var(--display);font-weight:600;font-size:40px;line-height:1.1;margin:6px 0 8px}
+.kpi .num small{font-size:18px;color:var(--muted);font-family:var(--body);font-weight:600}
+.kpi.resumen{grid-column:1/-1}
+
+/* ---------- barras apiladas ---------- */
+.stack{display:flex;height:26px;border-radius:8px;overflow:hidden;background:var(--track)}
+.stack.big{height:40px;border-radius:10px}
+.stack .seg{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;min-width:0;white-space:nowrap;overflow:hidden}
+.stack.big .seg{font-size:15px}
+.seg.Bien{background:var(--bien)}
+.seg.Regular{background:var(--regular);color:var(--ink)}
+.seg.Mal{background:var(--mal)}
+.stack.empty{align-items:center;justify-content:center;font-size:13px;color:var(--muted)}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:13.5px}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.leyenda i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.leyenda b{font-variant-numeric:tabular-nums}
+i.Bien{background:var(--bien)} i.Regular{background:var(--regular)} i.Mal{background:var(--mal)}
+
+/* ---------- barras horizontales ---------- */
+.hrow{display:grid;grid-template-columns:1fr auto;grid-template-areas:"lbl lbl" "trk val";column-gap:10px;row-gap:3px;margin-bottom:10px}
+.hlabel{grid-area:lbl;font-size:14px;font-weight:500}
+.hlabel small{color:var(--muted);font-weight:500}
+.htrack{grid-area:trk;height:14px;background:var(--track);border-radius:99px;overflow:hidden;align-self:center}
+.hfill{display:block;height:100%;border-radius:99px;background:var(--verde);transition:width .4s ease}
+.hfill.Bien{background:var(--bien)} .hfill.Regular{background:var(--regular)} .hfill.Mal{background:var(--mal)}
+.hfill.neutro{background:#3F8C8C}
+.hval{grid-area:val;font-size:13.5px;font-variant-numeric:tabular-nums;min-width:82px;text-align:right}
+.hval small{color:var(--muted)}
+
+.pill{display:inline-block;min-width:40px;text-align:center;padding:3px 9px;border-radius:99px;font-weight:700;font-size:13.5px;font-variant-numeric:tabular-nums;color:#fff}
+.pill.Bien{background:var(--bien)} .pill.Regular{background:var(--regular);color:var(--ink)} .pill.Mal{background:var(--mal)}
+.pill.nd{background:var(--track);color:var(--muted)}
+
+/* ---------- comparar ---------- */
+.tabla{display:flex;flex-direction:column;gap:2px}
+.fila{display:grid;grid-template-columns:minmax(150px,1.3fr) 60px 70px minmax(200px,3fr);gap:14px;align-items:center;padding:10px 6px;border-bottom:1px solid var(--track)}
+.fila:last-child{border-bottom:none}
+.fila.cab{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-top:0}
+.fila .nom{font-weight:600}
+.fila .nom small{display:block;color:var(--muted);font-weight:500;font-size:12.5px}
+.fila .n{font-variant-numeric:tabular-nums;text-align:center}
+@media (max-width:640px){
+  .fila{grid-template-columns:1fr 50px 60px;row-gap:6px}
+  .fila .barra{grid-column:1/-1}
+  .fila.cab .barra{display:none}
+}
+
+/* ---------- desglose dentro de una pregunta ---------- */
+.desg{display:grid;grid-template-columns:minmax(90px,.9fr) 2fr;gap:6px 10px;align-items:center;font-size:13.5px}
+.desg .g{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desg .g small{color:var(--muted);font-weight:500}
+.desg .stack{height:20px}
+.desg .seg{font-size:11.5px}
+
+/* ---------- semanas ---------- */
+.semanas{display:flex;align-items:flex-end;gap:8px;height:230px;padding-top:22px;overflow-x:auto}
+.sem{flex:1 0 42px;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.sem .col{width:100%;max-width:56px;display:flex;flex-direction:column-reverse;border-radius:8px 8px 0 0;overflow:hidden;position:relative}
+.sem .col span{display:block}
+.sem .tot{font-size:13px;font-weight:700;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.sem .fecha{font-size:12px;color:var(--muted);margin-top:6px;white-space:nowrap}
+.col .Bien{background:var(--bien)} .col .Regular{background:var(--regular)} .col .Mal{background:var(--mal)}
+
+/* ---------- casos ---------- */
+.casos{display:flex;flex-direction:column;gap:10px}
+.caso{background:var(--card);border-radius:14px;padding:14px 16px;border-left:5px solid var(--mal);display:grid;grid-template-columns:1fr auto;gap:6px 14px}
+.caso .donde{font-weight:700}
+.caso .meta{color:var(--muted);font-size:13.5px}
+.caso .chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#F8D7DA;color:#842029;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:99px}
+.mas{margin-top:12px}
+
+footer{color:var(--muted);font-size:13px;padding:30px 0 40px;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="login-card">
+    <h1>Encuesta 3er día</h1>
+    <p>Dashboard de Recursos Humanos. Ingresá la clave para ver las respuestas.</p>
+    <form id="formLogin">
+      <input type="password" id="clave" placeholder="Clave" autocomplete="current-password" required>
+      <p class="error" id="errLogin"></p>
+      <button class="btn full" id="btnEntrar" type="submit">Entrar</button>
+    </form>
+    <button class="btn ghost full" id="btnDemo" style="margin-top:10px" hidden>Ver con datos de ejemplo</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" hidden>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1>Encuesta 3er día <span class="demo-tag" id="demoTag" hidden>DATOS DE EJEMPLO</span></h1>
+        <div class="sub" id="subtitulo"></div>
+      </div>
+      <div class="acciones">
+        <button class="btn ghost small" id="btnActualizar">Actualizar</button>
+        <button class="btn ghost small" id="btnSalir">Salir</button>
+      </div>
+    </header>
+  </div>
+
+  <div class="filtros">
+    <div class="wrap">
+      <div class="f"><label for="fMarca">Marca</label><select id="fMarca" data-k="marca"></select></div>
+      <div class="f"><label for="fZona">Zona</label><select id="fZona" data-k="zona"></select></div>
+      <div class="f"><label for="fLocal">Local</label><select id="fLocal" data-k="local"></select></div>
+      <div class="f"><label for="fRol">Rol</label><select id="fRol" data-k="rol"></select></div>
+      <div class="f"><label for="fEdad">Edad</label><select id="fEdad" data-k="edad"></select></div>
+      <div class="f"><label for="fExp">Experiencia</label><select id="fExp" data-k="experiencia"></select></div>
+      <div class="f"><label for="fDesde">Desde</label><input type="date" id="fDesde"></div>
+      <div class="f"><label for="fHasta">Hasta</label><input type="date" id="fHasta"></div>
+      <label class="check"><input type="checkbox" id="fAlerta"> Solo seguimiento</label>
+      <button class="btn ghost small" id="btnLimpiar">Limpiar</button>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="bloque">
+      <div class="bloque-head"><h2>Resumen</h2></div>
+      <div class="grid kpis" id="resumen"></div>
+    </section>
+
+    <section class="bloque">
+      <div class="bloque-head">
+        <h2>Comparar por</h2>
+        <div class="ctrl">
+          <select id="dim" aria-label="Dimensión"></select>
+          <select id="orden" aria-label="Orden">
+            <option value="indice-desc">Mejor índice primero</option>
+            <option value="indice-asc">Peor índice primero</option>
+            <option value="mal-desc">Más "Mal" primero</option>
+            <option value="n-desc">Más encuestas primero</option>
+            <option value="nombre">Nombre</option>
+          </select>
+        </div>
+      </div>
+      <p class="nota">Cada barra muestra cómo se reparten las encuestas del grupo entre Bien, Más o menos y Mal (según el índice de onboarding).</p>
+      <div class="card"><div class="tabla" id="comparar"></div></div>
+    </section>
+
+    <section class="bloque">
+      <div class="bloque-head">
+        <h2>Pregunta por pregunta</h2>
+        <div class="ctrl">
+          <label class="check"><input type="checkbox" id="desglose"> Desglosar por <span id="dimNombre"></span></label>
+        </div>
+      </div>
+      <div class="grid preguntas" id="preguntas"></div>
+    </section>
+
+    <section class="bloque">
+      <div class="bloque-head"><h2>Tareas aprendidas y mejoras</h2></div>
+      <p class="nota">Porcentaje de encuestados que eligió cada opción (se podía elegir más de una).</p>
+      <div class="grid dos">
+        <div class="card"><h3>¿Qué tareas aprendieron en estos 3 días?</h3><div id="tareas"></div></div>
+        <div class="card"><h3>¿Qué podríamos mejorar?</h3><div id="mejoras"></div></div>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <div class="bloque-head"><h2>Ranking de locales</h2></div>
+      <p class="nota">Por índice de onboarding promedio. Solo locales con al menos <span id="minRank"></span> encuestas.</p>
+      <div class="grid dos">
+        <div class="card"><h3>Mejores</h3><div id="rankMejores"></div></div>
+        <div class="card"><h3>A mejorar</h3><div id="rankPeores"></div></div>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <div class="bloque-head"><h2>Evolución semanal</h2></div>
+      <p class="nota">Encuestas recibidas por semana (lunes a domingo), según su categoría.</p>
+      <div class="card"><div class="semanas" id="semanas"></div><div id="leyendaSem"></div></div>
+    </section>
+
+    <section class="bloque">
+      <div class="bloque-head"><h2>Casos para seguimiento</h2></div>
+      <p class="nota">Encuestas con alguna respuesta de alerta. Las más recientes primero.</p>
+      <div class="casos" id="casos"></div>
+      <button class="btn ghost small mas" id="btnMasCasos" hidden></button>
+    </section>
+  </main>
+
+  <footer>Datos confidenciales del área de Recursos Humanos.</footer>
+</div>
+
+<script>
+/* ============================================================
+   Pegá acá la misma URL del Web App que usa index.html (termina en /exec).
+   Sin URL, el dashboard ofrece ver datos de ejemplo.
+   ============================================================ */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwbaHJoa3Gbygq2MQs7Q7b77h5csTd19ZwLoNMauFNyHszL_4Sfo174jgL9YA-U-fT/exec";
+
+const CATS = ['Bien', 'Regular', 'Mal'];
+const CAT_TXT = { Bien: 'Bien', Regular: 'Más o menos', Mal: 'Mal' };
+const CAT_LARGO = { Bien: 'Muy bien / Bien', Regular: 'Más o menos', Mal: 'Mal / Muy mal' };
+const CORTE_BIEN = 75, CORTE_REGULAR = 50;
+const MIN_RANKING = 3;
+
+// [valor tal cual llega de index.html, categoría, puntaje, texto a mostrar (opcional)]
+// Los puntajes son los mismos de ESCALAS en apps-script/Code.gs.
+const PREGUNTAS = [
+  { k: 'recibimiento', t: '¿Cómo lo recibieron el primer día?', indice: true, ops: [
+    ['Me recibieron y me presentaron al equipo', 'Bien', 3],
+    ['Me recibieron pero no me presentaron', 'Regular', 2],
+    ['Nadie me recibió', 'Mal', 1]] },
+  { k: 'entrenador', t: '¿Tuvo un Entrenador/a que lo acompañó?', indice: true, ops: [
+    ['Sí, me acompañó todo el tiempo', 'Bien', 4],
+    ['Sí, pero solo a ratos', 'Regular', 3],
+    ['No, aprendí con distintos compañeros', 'Regular', 2],
+    ['No, estuve solo/a', 'Mal', 1]] },
+  { k: 'entrenamiento', t: '¿Cómo le enseñaron las tareas?', indice: true, ops: [
+    ['Me explicaron todo con paciencia', 'Bien', 4],
+    ['Me explicaron lo básico y me fui acomodando', 'Bien', 3],
+    ['Me explicaron poco, aprendí mirando', 'Regular', 2],
+    ['Casi no me explicaron nada', 'Mal', 1]] },
+  { k: 'seguridad', t: '¿Le explicaron seguridad e higiene?', indice: true, ops: [
+    ['Sí, me lo explicaron bien', 'Bien', 3],
+    ['Me explicaron algo', 'Regular', 2],
+    ['No me explicaron', 'Mal', 1]] },
+  { k: 'horarios', t: '¿Le explicaron los horarios y pudo fichar?', indice: true, ops: [
+    ['Me explicaron los horarios y pude fichar', 'Bien', 3],
+    ['Me explicaron los horarios, pero no pude fichar', 'Regular', 2],
+    ['Pude fichar, pero no me explicaron los horarios', 'Regular', 2],
+    ['No me explicaron los horarios ni pude fichar', 'Mal', 1]] },
+  { k: 'descansos', t: '¿Pudo tomar sus descansos?', indice: true, ops: [
+    ['Sí, siempre', 'Bien', 3], ['A veces', 'Regular', 2], ['No', 'Mal', 1]] },
+  { k: 'trato', t: '¿Cómo fue el trato en sus primeros días?', indice: true, ops: [
+    ['Muy bueno', 'Bien', 4], ['Bueno', 'Bien', 3], ['Regular', 'Regular', 2], ['Malo', 'Mal', 1]] },
+  { k: 'referente', t: '¿Sabe a quién recurrir si tiene un problema?', indice: true, ops: [
+    ['Sí, sé a quién recurrir', 'Bien', 3], ['Más o menos', 'Regular', 2], ['No sé a quién recurrir', 'Mal', 1]] },
+  { k: 'inconveniente', t: '¿Sucedió algo que no le agradó?', indice: false, ops: [
+    ['No', 'Bien', 2, 'No, todo bien'], ['Sí', 'Mal', 1, 'Sí, pasó algo']] },
+  { k: 'general', t: 'En general, ¿cómo fueron sus primeros 3 días?', indice: false, ops: [
+    ['Muy buena', 'Bien', 5, 'Muy buenos'], ['Buena', 'Bien', 4, 'Buenos'], ['Regular', 'Regular', 3, 'Regulares'],
+    ['Mala', 'Mal', 2, 'Malos'], ['Muy mala', 'Mal', 1, 'Muy malos']] }
+];
+const PREG = Object.fromEntries(PREGUNTAS.map(p => [p.k, p]));
+
+const TAREAS = ['Caja', 'Cocina / Plancha', 'Freidora', 'Armado de pedidos', 'Delivery / Drive', 'Limpieza', 'Atención al cliente'];
+const MEJORAS = [
+  'El recibimiento del primer día', 'La explicación de las tareas', 'La explicación de seguridad e higiene',
+  'La organización de horarios y turnos', 'El trato entre compañeros', 'La comunicación de los responsables',
+  'Los descansos', 'El orden y la limpieza', 'Nada, estuvo todo bien'
+];
+
+const DIMS = {
+  marca: 'Marca', zona: 'Zona', local: 'Local', rol: 'Rol', edad: 'Edad',
+  experiencia: 'Experiencia previa', entrenador: 'Entrenador asignado'
+};
+const ORDEN_VALORES = {
+  zona: ['Sur', 'CABA', 'Oeste', 'Norte', 'GBA'],
+  rol: ['Gerente', 'Encargado', 'Entrenador', 'Full-time', 'Part-time'],
+  edad: ['18 a 22 años', '23 a 28 años', '29 a 32 años', 'Más de 32 años'],
+  experiencia: ['Sí', 'No'],
+  entrenador: PREG.entrenador.ops.map(o => o[0])
+};
+const TEXTO_VALOR = { experiencia: { 'Sí': 'Con experiencia previa', 'No': 'Sin experiencia previa' } };
+
+/* ---------- estado ---------- */
+let datos = [];
+let modoDemo = false;
+const filtro = { marca: '', zona: '', local: '', rol: '', edad: '', experiencia: '', desde: '', hasta: '', alerta: false };
+let casosVisibles = 15;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pct = (n, t) => t ? n / t * 100 : 0;
+const valido = v => v !== undefined && v !== null && v !== '' && v !== 'S/D';
+const textoValor = (k, v) => (TEXTO_VALOR[k] && TEXTO_VALOR[k][v]) || v;
+
+/* ---------- cálculos por encuesta ---------- */
+function catDeRespuesta(k, v) {
+  const op = PREG[k] && PREG[k].ops.find(o => o[0] === v);
+  return op ? op[1] : null;
+}
+
+function indiceDe(r) {
+  const vals = PREGUNTAS.filter(p => p.indice).map(p => {
+    const op = p.ops.find(o => o[0] === r[p.k]);
+    if (!op) return null;
+    const max = Math.max(...p.ops.map(o => o[2]));
+    return (op[2] - 1) / (max - 1) * 100;
+  }).filter(v => v !== null);
+  return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+}
+
+function categoriaDe(ind) {
+  if (ind === null) return null;
+  return ind >= CORTE_BIEN ? 'Bien' : ind >= CORTE_REGULAR ? 'Regular' : 'Mal';
+}
+
+function motivosDe(r) {
+  const m = [];
+  if (r.inconveniente === 'Sí') m.push('Reportó un inconveniente');
+  if (r.trato === 'Malo') m.push('Trato malo');
+  if (r.recibimiento === 'Nadie me recibió') m.push('Nadie lo recibió');
+  if (r.entrenador === 'No, estuve solo/a') m.push('Estuvo solo/a, sin entrenador');
+  if (r.entrenamiento === 'Casi no me explicaron nada') m.push('Casi no le explicaron las tareas');
+  if (r.seguridad === 'No me explicaron') m.push('Sin explicación de seguridad e higiene');
+  if (r.horarios === 'No me explicaron los horarios ni pude fichar') m.push('Sin horarios ni fichaje');
+  if (r.descansos === 'No') m.push('No pudo tomar descansos');
+  if (r.general === 'Mala' || r.general === 'Muy mala') m.push('Experiencia general mala');
+  return m;
+}
+
+const lista = v => Array.isArray(v) ? v : (valido(v) ? String(v).split(' | ').filter(Boolean) : []);
+
+// Deja cada fila lista para analizar, venga del Apps Script o de los datos de ejemplo.
+function normalizar(r) {
+  const o = Object.assign({}, r);
+  o.fecha = o.fecha ? new Date(o.fecha) : null;
+  if (o.fecha && isNaN(o.fecha.getTime())) o.fecha = null;
+  o.tareas = lista(o.tareas);
+  o.mejoras = lista(o.mejoras);
+  const ind = valido(o.indice) ? Number(o.indice) : indiceDe(o);
+  o.indice = isNaN(ind) ? null : ind;
+  o.categoria = CATS.includes(o.categoria) ? o.categoria : categoriaDe(o.indice);
+  o.motivos = o.motivos !== undefined ? lista(o.motivos) : motivosDe(o);
+  o.alerta = o.alerta ? o.alerta === 'SÍ' || o.alerta === true : o.motivos.length > 0;
+  return o;
+}
+
+/* ---------- carga ---------- */
+async function cargar(clave) {
+  const r = await fetch(APPS_SCRIPT_URL + '?clave=' + encodeURIComponent(clave));
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'Error desconocido');
+  return j.filas;
+}
+
+async function entrar(clave) {
+  $('errLogin').textContent = '';
+  $('btnEntrar').disabled = true;
+  $('btnEntrar').textContent = 'Cargando…';
+  try {
+    const filas = await cargar(clave);
+    sessionStorage.setItem('clave3dia', clave);
+    iniciar(filas, false);
+  } catch (e) {
+    sessionStorage.removeItem('clave3dia');
+    $('errLogin').textContent = e.message === 'no autorizado' ? 'Clave incorrecta.' : 'No se pudieron cargar los datos: ' + e.message;
+  } finally {
+    $('btnEntrar').disabled = false;
+    $('btnEntrar').textContent = 'Entrar';
+  }
+}
+
+function iniciar(filas, demo) {
+  modoDemo = demo;
+  datos = filas.map(normalizar);
+  $('login').hidden = true;
+  $('app').hidden = false;
+  $('demoTag').hidden = !demo;
+  construirFiltros();
+  render();
+}
+
+$('formLogin').onsubmit = e => {
+  e.preventDefault();
+  if (!APPS_SCRIPT_URL) { $('errLogin').textContent = 'Falta configurar APPS_SCRIPT_URL en dashboard.html.'; return; }
+  entrar($('clave').value.trim());
+};
+$('btnDemo').onclick = () => iniciar(generarDemo(), true);
+$('btnSalir').onclick = () => {
+  sessionStorage.removeItem('clave3dia');
+  datos = [];
+  $('app').hidden = true;
+  $('login').hidden = false;
+  $('clave').value = '';
+};
+$('btnActualizar').onclick = async () => {
+  const b = $('btnActualizar');
+  if (modoDemo) { iniciar(generarDemo(), true); return; }
+  b.disabled = true; b.textContent = 'Actualizando…';
+  try {
+    datos = (await cargar(sessionStorage.getItem('clave3dia'))).map(normalizar);
+    construirFiltros();
+    render();
+  } catch (e) {
+    alert('No se pudieron actualizar los datos: ' + e.message);
+  } finally {
+    b.disabled = false; b.textContent = 'Actualizar';
+  }
+};
+
+/* ---------- filtros ---------- */
+const SELECTS = ['fMarca', 'fZona', 'fLocal', 'fRol', 'fEdad', 'fExp'].map($);
+
+function ordenar(k, valores) {
+  const ref = ORDEN_VALORES[k];
+  return valores.sort((a, b) => {
+    if (ref) {
+      const ia = ref.indexOf(a), ib = ref.indexOf(b);
+      if (ia !== ib) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    }
+    return String(a).localeCompare(String(b), 'es');
+  });
+}
+
+function construirFiltros() {
+  SELECTS.forEach(sel => {
+    const k = sel.dataset.k;
+    let base = datos;
+    if (k === 'local') base = datos.filter(r => (!filtro.marca || r.marca === filtro.marca) && (!filtro.zona || r.zona === filtro.zona));
+    const valores = ordenar(k, [...new Set(base.map(r => r[k]).filter(valido))]);
+    if (filtro[k] && !valores.includes(filtro[k])) filtro[k] = '';
+    sel.innerHTML = '<option value="">Todos</option>' +
+      valores.map(v => '<option value="' + esc(v) + '"' + (v === filtro[k] ? ' selected' : '') + '>' + esc(textoValor(k, v)) + '</option>').join('');
+    sel.classList.toggle('on', !!filtro[k]);
+  });
+  $('fDesde').value = filtro.desde; $('fHasta').value = filtro.hasta; $('fAlerta').checked = filtro.alerta;
+  $('fDesde').classList.toggle('on', !!filtro.desde); $('fHasta').classList.toggle('on', !!filtro.hasta);
+}
+
+SELECTS.forEach(sel => sel.onchange = () => {
+  filtro[sel.dataset.k] = sel.value;
+  casosVisibles = 15;
+  construirFiltros();
+  render();
+});
+['fDesde', 'fHasta'].forEach(id => $(id).onchange = () => {
+  filtro[id === 'fDesde' ? 'desde' : 'hasta'] = $(id).value;
+  construirFiltros();
+  render();
+});
+$('fAlerta').onchange = () => { filtro.alerta = $('fAlerta').checked; render(); };
+$('btnLimpiar').onclick = () => {
+  Object.keys(filtro).forEach(k => filtro[k] = k === 'alerta' ? false : '');
+  construirFiltros();
+  render();
+};
+
+function filtrados() {
+  const desde = filtro.desde ? new Date(filtro.desde + 'T00:00:00') : null;
+  const hasta = filtro.hasta ? new Date(filtro.hasta + 'T23:59:59') : null;
+  return datos.filter(r =>
+    ['marca', 'zona', 'local', 'rol', 'edad', 'experiencia'].every(k => !filtro[k] || r[k] === filtro[k]) &&
+    (!desde || (r.fecha && r.fecha >= desde)) &&
+    (!hasta || (r.fecha && r.fecha <= hasta)) &&
+    (!filtro.alerta || r.alerta)
+  );
+}
+
+/* ---------- piezas visuales ---------- */
+function contar(rows, fn) {
+  const c = { Bien: 0, Regular: 0, Mal: 0 };
+  let n = 0;
+  rows.forEach(r => { const k = fn(r); if (k) { c[k]++; n++; } });
+  return { c, n };
+}
+
+function stack(c, n, big) {
+  if (!n) return '<div class="stack empty' + (big ? ' big' : '') + '">Sin datos</div>';
+  return '<div class="stack' + (big ? ' big' : '') + '">' + CATS.map(k => {
+    if (!c[k]) return '';
+    const p = pct(c[k], n);
+    return '<span class="seg ' + k + '" style="width:' + p + '%" title="' + CAT_TXT[k] + ': ' + c[k] + ' (' + Math.round(p) + '%)">' +
+      (p >= 9 ? Math.round(p) + '%' : '') + '</span>';
+  }).join('') + '</div>';
+}
+
+function leyenda(c, n, largo) {
+  return '<div class="leyenda">' + CATS.map(k =>
+    '<span><i class="' + k + '"></i>' + (largo ? CAT_LARGO[k] : CAT_TXT[k]) + ': <b>' + Math.round(pct(c[k], n)) + '%</b> (' + c[k] + ')</span>'
+  ).join('') + '</div>';
+}
+
+function leyendaSimple() {
+  return '<div class="leyenda">' + CATS.map(k => '<span><i class="' + k + '"></i>' + CAT_LARGO[k] + '</span>').join('') + '</div>';
+}
+
+function hbar(label, n, total, cls, valor) {
+  const p = pct(n, total);
+  return '<div class="hrow"><div class="hlabel">' + label + '</div>' +
+    '<div class="htrack"><span class="hfill ' + cls + '" style="width:' + p + '%"></span></div>' +
+    '<div class="hval">' + (valor || '<b>' + Math.round(p) + '%</b> <small>(' + n + ')</small>') + '</div></div>';
+}
+
+function pill(ind) {
+  if (ind === null || isNaN(ind)) return '<span class="pill nd">s/d</span>';
+  return '<span class="pill ' + categoriaDe(ind) + '" title="Índice de onboarding (0 a 100)">' + Math.round(ind) + '</span>';
+}
+
+function promedio(rows) {
+  const v = rows.map(r => r.indice).filter(x => x !== null);
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+}
+
+// Agrupa por dimensión. Los locales se separan por marca porque hay nombres repetidos.
+function agrupar(rows, dim) {
+  const g = new Map();
+  rows.forEach(r => {
+    if (!valido(r[dim])) return;
+    const key = dim === 'local' ? r.marca + '|' + r.local : r[dim];
+    if (!g.has(key)) g.set(key, {
+      key, valor: r[dim], label: textoValor(dim, r[dim]),
+      sub: dim === 'local' ? r.marca + ' · ' + r.zona : '', rows: []
+    });
+    g.get(key).rows.push(r);
+  });
+  return [...g.values()];
+}
+
+/* ---------- secciones ---------- */
+function renderResumen(rows) {
+  const n = rows.length;
+  const cat = contar(rows, r => r.categoria);
+  const ind = promedio(rows);
+  const inc = rows.filter(r => r.inconveniente === 'Sí').length;
+  const incN = rows.filter(r => valido(r.inconveniente)).length;
+  const al = rows.filter(r => r.alerta).length;
+  const gen = contar(rows, r => catDeRespuesta('general', r.general));
+
+  $('resumen').innerHTML =
+    '<div class="card kpi"><div class="lbl">Encuestas</div><div class="num">' + n + '</div>' +
+      '<div class="nota" style="margin:0">' + (n === datos.length ? 'Total recibidas' : 'de ' + datos.length + ' recibidas') + '</div></div>' +
+    '<div class="card kpi"><div class="lbl">Índice de onboarding</div><div class="num">' +
+      (ind === null ? '–' : Math.round(ind)) + ' <small>/ 100</small></div>' +
+      '<div class="htrack" style="height:12px"><span class="hfill ' + (categoriaDe(ind) || '') + '" style="width:' + (ind || 0) + '%"></span></div></div>' +
+    '<div class="card kpi"><div class="lbl">Reportaron un inconveniente</div><div class="num">' + Math.round(pct(inc, incN)) + '<small>%</small></div>' +
+      '<div class="htrack" style="height:12px"><span class="hfill Mal" style="width:' + pct(inc, incN) + '%"></span></div>' +
+      '<div class="nota" style="margin:6px 0 0">' + inc + ' de ' + incN + '</div></div>' +
+    '<div class="card kpi"><div class="lbl">Requieren seguimiento</div><div class="num">' + Math.round(pct(al, n)) + '<small>%</small></div>' +
+      '<div class="htrack" style="height:12px"><span class="hfill Mal" style="width:' + pct(al, n) + '%"></span></div>' +
+      '<div class="nota" style="margin:6px 0 0">' + al + ' de ' + n + '</div></div>' +
+    '<div class="card kpi resumen"><h3>¿Cómo les fue a las encuestas? <span class="nota">(índice de onboarding: Bien 75 o más, Más o menos 50 a 74, Mal menos de 50)</span></h3>' +
+      stack(cat.c, cat.n, true) + leyenda(cat.c, cat.n, true) +
+      '<h3 style="margin-top:18px">Lo que ellos dicen de sus primeros 3 días</h3>' +
+      stack(gen.c, gen.n, true) + leyenda(gen.c, gen.n, true) + '</div>';
+}
+
+function renderComparar(rows) {
+  const dim = $('dim').value;
+  const orden = $('orden').value;
+  const grupos = agrupar(rows, dim).map(g => Object.assign(g, { ind: promedio(g.rows), cat: contar(g.rows, r => r.categoria) }));
+  const ref = ORDEN_VALORES[dim];
+  grupos.sort((a, b) => {
+    if (orden === 'indice-desc') return (b.ind ?? -1) - (a.ind ?? -1);
+    if (orden === 'indice-asc') return (a.ind ?? 999) - (b.ind ?? 999);
+    if (orden === 'mal-desc') return pct(b.cat.c.Mal, b.cat.n) - pct(a.cat.c.Mal, a.cat.n);
+    if (orden === 'n-desc') return b.rows.length - a.rows.length;
+    if (ref) return ref.indexOf(a.valor) - ref.indexOf(b.valor);
+    return String(a.label).localeCompare(String(b.label), 'es');
+  });
+  if (!grupos.length) { $('comparar').innerHTML = '<div class="vacio">No hay encuestas con estos filtros.</div>'; return; }
+  $('comparar').innerHTML =
+    '<div class="fila cab"><span>' + esc(DIMS[dim]) + '</span><span class="n">Encuestas</span><span class="n">Índice</span><span class="barra">Bien / Más o menos / Mal</span></div>' +
+    grupos.map(g =>
+      '<div class="fila"><span class="nom">' + esc(g.label) + (g.sub ? '<small>' + esc(g.sub) + '</small>' : '') + '</span>' +
+      '<span class="n">' + g.rows.length + '</span><span class="n">' + pill(g.ind) + '</span>' +
+      '<span class="barra">' + stack(g.cat.c, g.cat.n) + '</span></div>'
+    ).join('') + leyendaSimple();
+}
+
+function renderPreguntas(rows) {
+  const dim = $('dim').value;
+  const desglose = $('desglose').checked;
+  $('dimNombre').textContent = DIMS[dim].toLowerCase();
+  $('preguntas').innerHTML = PREGUNTAS.map(p => {
+    const res = contar(rows, r => catDeRespuesta(p.k, r[p.k]));
+    let cuerpo;
+    if (!res.n) {
+      cuerpo = '<div class="vacio">Sin respuestas.</div>';
+    } else if (desglose) {
+      const grupos = agrupar(rows, dim)
+        .map(g => Object.assign(g, { res: contar(g.rows, r => catDeRespuesta(p.k, r[p.k])) }))
+        .filter(g => g.res.n)
+        .sort((a, b) => pct(b.res.c.Bien, b.res.n) - pct(a.res.c.Bien, a.res.n));
+      cuerpo = '<div class="desg">' + grupos.map(g =>
+        '<span class="g" title="' + esc(g.label + (g.sub ? ' · ' + g.sub : '')) + '">' + esc(g.label) + ' <small>(' + g.res.n + ')</small></span>' +
+        stack(g.res.c, g.res.n)
+      ).join('') + '</div>';
+    } else {
+      cuerpo = p.ops.map(o => hbar(esc(o[3] || o[0]), rows.filter(r => r[p.k] === o[0]).length, res.n, o[1])).join('');
+    }
+    return '<div class="card"><h3>' + esc(p.t) + '</h3>' + stack(res.c, res.n) + leyenda(res.c, res.n) +
+      '<div style="margin-top:14px">' + cuerpo + '</div></div>';
+  }).join('');
+}
+
+function renderMultiples(rows) {
+  const conTareas = rows.filter(r => r.tareas.length);
+  const conMejoras = rows.filter(r => r.mejoras.length);
+  const frec = (items, base, campo, clase) => {
+    if (!base.length) return '<div class="vacio">Sin respuestas.</div>';
+    return items
+      .map(it => ({ it, n: base.filter(r => r[campo].includes(it)).length }))
+      .sort((a, b) => b.n - a.n)
+      .map(x => hbar(esc(x.it), x.n, base.length, clase(x.it))).join('') +
+      '<div class="nota" style="margin:6px 0 0">Sobre ' + base.length + ' encuestas.</div>';
+  };
+  $('tareas').innerHTML = frec(TAREAS, conTareas, 'tareas', () => 'neutro');
+  $('mejoras').innerHTML = frec(MEJORAS, conMejoras, 'mejoras', it => it === 'Nada, estuvo todo bien' ? 'Bien' : 'Regular');
+}
+
+function renderRanking(rows) {
+  $('minRank').textContent = MIN_RANKING;
+  const locales = agrupar(rows, 'local')
+    .map(g => Object.assign(g, { ind: promedio(g.rows) }))
+    .filter(g => g.rows.length >= MIN_RANKING && g.ind !== null);
+  const fila = g => hbar(esc(g.label) + ' <small>· ' + esc(g.sub) + ' · ' + g.rows.length + ' enc.</small>',
+    g.ind, 100, categoriaDe(g.ind), '<b>' + Math.round(g.ind) + '</b> <small>/ 100</small>');
+  if (!locales.length) {
+    const msg = '<div class="vacio">Todavía no hay locales con ' + MIN_RANKING + ' o más encuestas.</div>';
+    $('rankMejores').innerHTML = msg; $('rankPeores').innerHTML = msg;
+    return;
+  }
+  const orden = [...locales].sort((a, b) => b.ind - a.ind);
+  const top = orden.slice(0, 5);
+  const peores = orden.slice().reverse().filter(g => !top.includes(g)).slice(0, 5);
+  $('rankMejores').innerHTML = top.map(fila).join('');
+  $('rankPeores').innerHTML = peores.length ? peores.map(fila).join('') : '<div class="vacio">No hay suficientes locales para comparar.</div>';
+}
+
+function lunes(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  x.setDate(x.getDate() - (x.getDay() + 6) % 7);
+  return x;
+}
+
+function renderSemanas(rows) {
+  const con = rows.filter(r => r.fecha);
+  if (!con.length) { $('semanas').innerHTML = '<div class="vacio">Sin datos.</div>'; $('leyendaSem').innerHTML = ''; return; }
+  const semanas = new Map();
+  con.forEach(r => {
+    const k = lunes(r.fecha).getTime();
+    if (!semanas.has(k)) semanas.set(k, { Bien: 0, Regular: 0, Mal: 0, n: 0 });
+    const s = semanas.get(k);
+    s.n++;
+    if (r.categoria) s[r.categoria]++;
+  });
+  // Completa las semanas sin encuestas para que el eje sea continuo (máximo 16 semanas).
+  const claves = [...semanas.keys()].sort((a, b) => a - b);
+  const todas = [];
+  for (let t = claves[0]; t <= claves[claves.length - 1]; ) {
+    todas.push(t);
+    const d = new Date(t); d.setDate(d.getDate() + 7); t = d.getTime();
+  }
+  const ult = todas.slice(-16);
+  const max = Math.max(...ult.map(t => (semanas.get(t) || { n: 0 }).n), 1);
+  $('semanas').innerHTML = ult.map(t => {
+    const s = semanas.get(t) || { Bien: 0, Regular: 0, Mal: 0, n: 0 };
+    const alto = s.n / max * 170;
+    const f = new Date(t);
+    return '<div class="sem" title="Semana del ' + f.toLocaleDateString('es-AR') + ': ' + s.n + ' encuestas">' +
+      '<span class="tot">' + s.n + '</span>' +
+      '<div class="col" style="height:' + alto + 'px">' +
+        CATS.map(k => s[k] ? '<span class="' + k + '" style="height:' + pct(s[k], s.n) + '%"></span>' : '').join('') +
+      '</div><span class="fecha">' + f.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) + '</span></div>';
+  }).join('');
+  $('leyendaSem').innerHTML = leyendaSimple();
+}
+
+function renderCasos(rows) {
+  const casos = rows.filter(r => r.alerta).sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+  if (!casos.length) {
+    $('casos').innerHTML = '<div class="card vacio">No hay casos para seguimiento con estos filtros. 🎉</div>';
+    $('btnMasCasos').hidden = true;
+    return;
+  }
+  $('casos').innerHTML = casos.slice(0, casosVisibles).map(r =>
+    '<div class="caso"><div><div class="donde">' + esc(r.local || 'Local s/d') + ' <span class="meta">· ' + esc(r.marca) + ' · ' + esc(r.zona) + '</span></div>' +
+    '<div class="meta">' + (r.fecha ? r.fecha.toLocaleDateString('es-AR') : 'Fecha s/d') + ' · ' + esc(r.rol) + ' · ' + esc(r.edad) +
+      (valido(r.contacto) ? ' · Contactó a ' + esc(r.contacto) : '') + '</div></div>' +
+    '<div>' + pill(r.indice) + '</div>' +
+    '<div class="chips">' + r.motivos.map(m => '<span class="chip">' + esc(m) + '</span>').join('') + '</div></div>'
+  ).join('');
+  const resto = casos.length - casosVisibles;
+  $('btnMasCasos').hidden = resto <= 0;
+  $('btnMasCasos').textContent = 'Ver ' + Math.min(resto, 15) + ' más (quedan ' + resto + ')';
+}
+$('btnMasCasos').onclick = () => { casosVisibles += 15; renderCasos(filtrados()); };
+
+function render() {
+  const rows = filtrados();
+  const fechas = datos.map(r => r.fecha).filter(Boolean).sort((a, b) => a - b);
+  $('subtitulo').textContent = datos.length
+    ? datos.length + ' encuestas · del ' + fechas[0].toLocaleDateString('es-AR') + ' al ' + fechas[fechas.length - 1].toLocaleDateString('es-AR')
+    : 'Todavía no hay encuestas cargadas.';
+  renderResumen(rows);
+  renderComparar(rows);
+  renderPreguntas(rows);
+  renderMultiples(rows);
+  renderRanking(rows);
+  renderSemanas(rows);
+  renderCasos(rows);
+}
+
+$('dim').innerHTML = Object.keys(DIMS).map(k => '<option value="' + k + '">' + DIMS[k] + '</option>').join('');
+$('dim').onchange = () => { renderComparar(filtrados()); renderPreguntas(filtrados()); };
+$('orden').onchange = () => renderComparar(filtrados());
+$('desglose').onchange = () => renderPreguntas(filtrados());
+
+/* ---------- datos de ejemplo ---------- */
+function generarDemo() {
+  let semilla = 7;
+  const rnd = () => { semilla = (semilla * 16807) % 2147483647; return (semilla - 1) / 2147483646; };
+  const elegir = arr => arr[Math.floor(rnd() * arr.length)];
+  const LOC = {
+    'Hamburguesas Extremas': { Sur: ['Adrogué', 'Banfield', 'Lanús', 'Temperley'], CABA: ['Caballito', 'Florida', 'Once'], Oeste: ['Castelar', 'Morón', 'Merlo'], Norte: ['Olivos', 'Pilar', 'San Isidro'], GBA: ['Rosario'] },
+    'Sabores Express': { Sur: ['Banfield', 'Quilmes 1', 'La Plata 1', 'Wilde'], CABA: ['Belgrano', 'Retiro', 'Boedo', 'Florida'], Oeste: ['Haedo', 'Ramos 1', 'San Justo 1'], Norte: ['Tigre', 'Munro', 'Escobar'], GBA: ['Mdq 1', 'Córdoba'] }
+  };
+  const calidad = {};
+  const hoy = Date.now();
+  const filas = [];
+  for (let i = 0; i < 190; i++) {
+    const marca = rnd() < .5 ? 'Hamburguesas Extremas' : 'Sabores Express';
+    const zona = elegir(Object.keys(LOC[marca]));
+    const local = elegir(LOC[marca][zona]);
+    const clave = marca + local;
+    if (calidad[clave] === undefined) calidad[clave] = rnd() * .7 - .3;
+    const q = calidad[clave];
+    // Opciones ordenadas de mejor a peor: los locales con calidad alta tienden a las primeras.
+    const opcion = ops => {
+      const u = Math.min(.999, Math.max(0, rnd() * .9 - q * .7));
+      return ops[Math.floor(Math.pow(u, 2.2) * ops.length)][0];
+    };
+    const r = {
+      fecha: new Date(hoy - rnd() * 84 * 864e5).toISOString(),
+      encuesta: '3er día',
+      rol: rnd() < .6 ? 'Part-time' : rnd() < .85 ? 'Full-time' : 'Entrenador',
+      edad: elegir(['18 a 22 años', '18 a 22 años', '23 a 28 años', '23 a 28 años', '29 a 32 años', 'Más de 32 años']),
+      experiencia: rnd() < .45 ? 'Sí' : 'No',
+      marca, zona, local
+    };
+    PREGUNTAS.forEach(p => { if (p.k !== 'inconveniente') r[p.k] = opcion(p.ops); });
+    r.inconveniente = rnd() < .12 - q * .2 ? 'Sí' : 'No';
+    r.contacto = r.inconveniente === 'Sí' && rnd() < .5 ? 'Zona ' + (zona === 'GBA' ? 'CABA' : zona) : 'S/D';
+    r.tareas = TAREAS.filter(() => rnd() < .4);
+    if (!r.tareas.length) r.tareas = [elegir(TAREAS)];
+    r.mejoras = q > .15 && rnd() < .5 ? ['Nada, estuvo todo bien'] : MEJORAS.slice(0, -1).filter(() => rnd() < .22);
+    if (!r.mejoras.length) r.mejoras = [elegir(MEJORAS)];
+    filas.push(r);
+  }
+  return filas;
+}
+
+/* ---------- arranque ---------- */
+const guardada = sessionStorage.getItem('clave3dia');
+if (!APPS_SCRIPT_URL || new URLSearchParams(location.search).has('demo')) $('btnDemo').hidden = false;
+if (APPS_SCRIPT_URL && guardada) { $('clave').value = guardada; entrar(guardada); }
+</script>
+</body>
+</html>
